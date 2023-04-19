@@ -81,10 +81,8 @@ func GetXORMappedAddrs(conn, conn2 net.PacketConn, serverAddr net.Addr, timeout 
 		software   *stun.Software
 	}, error) {
 		transId := stun.TransactionID
-		fmt.Println("sendStun:", addr, transId)
 		req, err := stun.Build(stun.BindingRequest, transId)
 		if err != nil {
-			fmt.Println("sendStun: Build error: ", err)
 			return nil, err
 		}
 		if attr != nil && v != nil {
@@ -92,7 +90,6 @@ func GetXORMappedAddrs(conn, conn2 net.PacketConn, serverAddr net.Addr, timeout 
 		}
 
 		if _, err = conn.WriteTo(req.Raw, addr); err != nil {
-			fmt.Println("sendStun: WriteTo error: ", err)
 			return nil, err
 		}
 
@@ -100,13 +97,11 @@ func GetXORMappedAddrs(conn, conn2 net.PacketConn, serverAddr net.Addr, timeout 
 		buf := make([]byte, maxMessageSize)
 		n, _, err := conn.ReadFrom(buf)
 		if err != nil {
-			fmt.Println("sendStun: ReadFrom error: ", err)
 			return nil, err
 		}
 
 		res := &stun.Message{Raw: buf[:n]}
 		if err = res.Decode(); err != nil {
-			fmt.Println("sendStun: Decode error: ", err)
 			return nil, err
 		}
 
@@ -119,12 +114,10 @@ func GetXORMappedAddrs(conn, conn2 net.PacketConn, serverAddr net.Addr, timeout 
 
 	ret, err := sendStun(conn, serverAddr, nil, nil)
 	if err != nil {
-		fmt.Println("sendStun: error: ", err)
 		return nil, err
 	}
 
 	if ret.xorAddr == nil {
-		fmt.Println("sendStun: xorAddr is nil")
 		return nil, errGetXorMappedAddrResponse
 	}
 	addrs = append(addrs, ret.xorAddr)
@@ -140,7 +133,6 @@ func GetXORMappedAddrs(conn, conn2 net.PacketConn, serverAddr net.Addr, timeout 
 	newServerAddr := net.UDPAddr{IP: ret.otherAddr.IP, Port: ret.otherAddr.Port}
 	ret2, err := sendStun(conn2, &newServerAddr, nil, nil)
 	if err != nil {
-		fmt.Println("sendStun: error: ", err)
 		return nil, err
 	}
 
